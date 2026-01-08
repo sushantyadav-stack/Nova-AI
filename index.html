@@ -2,187 +2,580 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova AI - Smart Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nova AI - Multi-AI Assistant</title>
+    
+    <!-- Meta for PWA -->
+    <meta name="theme-color" content="#10a37f">
+    <meta name="description" content="Advanced AI assistant with multiple AI models, voice features, and smart responses">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%2310a37f%22>🤖</text></svg>">
+    
+    <!-- Loading Animation -->
+    <style>
+        .nova-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .nova-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .nova-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        
+        .nova-loader-text {
+            color: white;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Main Container -->
-    <div class="container">
+    <!-- Loading Screen -->
+    <div class="nova-loader" id="novaLoader">
+        <div class="nova-spinner"></div>
+        <div class="nova-loader-text">Initializing Nova AI...</div>
+    </div>
+
+    <!-- Main App -->
+    <div class="nova-container" id="novaApp">
         <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
+        <aside class="nova-sidebar" id="novaSidebar">
             <div class="sidebar-header">
-                <h2><i class="fas fa-robot"></i> Nova AI</h2>
-                <button class="close-sidebar" onclick="toggleSidebar()">
+                <div class="logo-container">
+                    <div class="logo-icon animate__animated animate__pulse">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2>Nova AI</h2>
+                    <span class="beta-badge">BETA</span>
+                </div>
+                <button class="close-sidebar" onclick="NovaUI.toggleSidebar()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
             <div class="sidebar-content">
-                <!-- AI Selection -->
-                <div class="ai-selector">
-                    <h3><i class="fas fa-brain"></i> Select AI</h3>
-                    <div class="ai-options">
-                        <div class="ai-option active" data-ai="deepseek">
-                            <i class="fas fa-bolt"></i>
-                            <span>DeepSeek</span>
+                <!-- AI Models -->
+                <section class="sidebar-section">
+                    <h3><i class="fas fa-brain"></i> AI Models</h3>
+                    <div class="ai-grid">
+                        <div class="ai-model active" data-model="deepseek" onclick="NovaAI.selectModel('deepseek')">
+                            <div class="ai-icon deepseek">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="ai-info">
+                                <h4>DeepSeek</h4>
+                                <p>Fast & Technical</p>
+                            </div>
+                            <div class="ai-status online"></div>
                         </div>
-                        <div class="ai-option" data-ai="chatgpt">
-                            <i class="fas fa-comment"></i>
-                            <span>ChatGPT</span>
+                        
+                        <div class="ai-model" data-model="chatgpt" onclick="NovaAI.selectModel('chatgpt')">
+                            <div class="ai-icon chatgpt">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div class="ai-info">
+                                <h4>ChatGPT</h4>
+                                <p>Creative & Detailed</p>
+                            </div>
+                            <div class="ai-status online"></div>
                         </div>
-                        <div class="ai-option" data-ai="grok">
-                            <i class="fas fa-fire"></i>
-                            <span>Grok</span>
+                        
+                        <div class="ai-model" data-model="grok" onclick="NovaAI.selectModel('grok')">
+                            <div class="ai-icon grok">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="ai-info">
+                                <h4>Grok</h4>
+                                <p>Direct & Witty</p>
+                            </div>
+                            <div class="ai-status online"></div>
                         </div>
-                        <div class="ai-option" data-ai="claude">
-                            <i class="fas fa-leaf"></i>
-                            <span>Claude</span>
+                        
+                        <div class="ai-model" data-model="claude" onclick="NovaAI.selectModel('claude')">
+                            <div class="ai-icon claude">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="ai-info">
+                                <h4>Claude</h4>
+                                <p>Thoughtful & Safe</p>
+                            </div>
+                            <div class="ai-status online"></div>
                         </div>
                     </div>
-                </div>
-
+                </section>
+                
                 <!-- Quick Actions -->
-                <div class="quick-actions">
+                <section class="sidebar-section">
                     <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-                    <button class="action-btn" onclick="startVoiceInput()">
-                        <i class="fas fa-microphone"></i> Voice Input
-                    </button>
-                    <button class="action-btn" onclick="toggleDarkMode()">
-                        <i class="fas fa-moon"></i> Dark Mode
-                    </button>
-                    <button class="action-btn" onclick="clearChat()">
-                        <i class="fas fa-trash"></i> Clear Chat
-                    </button>
-                    <button class="action-btn" onclick="exportChat()">
-                        <i class="fas fa-download"></i> Export Chat
-                    </button>
-                </div>
-
-                <!-- History -->
-                <div class="chat-history">
-                    <h3><i class="fas fa-history"></i> History</h3>
-                    <div id="historyList"></div>
-                </div>
+                    <div class="actions-grid">
+                        <button class="action-btn voice-action" onclick="NovaVoice.toggleRecognition()">
+                            <i class="fas fa-microphone"></i>
+                            <span>Voice Input</span>
+                        </button>
+                        <button class="action-btn tts-action" onclick="NovaTTS.toggle()">
+                            <i class="fas fa-volume-up"></i>
+                            <span>Text-to-Speech</span>
+                        </button>
+                        <button class="action-btn theme-action" onclick="NovaUI.toggleTheme()">
+                            <i class="fas fa-moon"></i>
+                            <span>Dark Mode</span>
+                        </button>
+                        <button class="action-btn clear-action" onclick="NovaChat.clear()">
+                            <i class="fas fa-trash"></i>
+                            <span>Clear Chat</span>
+                        </button>
+                        <button class="action-btn export-action" onclick="NovaChat.export()">
+                            <i class="fas fa-download"></i>
+                            <span>Export</span>
+                        </button>
+                        <button class="action-btn history-action" onclick="NovaChat.showHistory()">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Settings -->
+                <section class="sidebar-section">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <span>Response Speed</span>
+                            <select onchange="NovaAI.setSpeed(this.value)">
+                                <option value="fast">Fast</option>
+                                <option value="balanced" selected>Balanced</option>
+                                <option value="detailed">Detailed</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <span>Auto-Scroll</span>
+                            <label class="switch">
+                                <input type="checkbox" checked onchange="NovaUI.toggleAutoScroll(this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>Markdown Support</span>
+                            <label class="switch">
+                                <input type="checkbox" checked onchange="NovaUI.toggleMarkdown(this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Stats -->
+                <section class="sidebar-section stats-section">
+                    <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="statMessages">0</div>
+                            <div class="stat-label">Messages</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statTokens">0</div>
+                            <div class="stat-label">Tokens</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statTime">0s</div>
+                            <div class="stat-label">Avg. Response</div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="username">User</span>
+                        <span class="user-status">Online</span>
+                    </div>
+                </div>
+                <button class="help-btn" onclick="NovaUI.showHelp()">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </aside>
 
         <!-- Main Chat Area -->
-        <div class="main-chat">
+        <main class="nova-main">
             <!-- Header -->
-            <header class="chat-header">
-                <button class="menu-btn" onclick="toggleSidebar()">
+            <header class="nova-header">
+                <button class="menu-toggle" onclick="NovaUI.toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1><i class="fas fa-robot"></i> Nova AI Assistant</h1>
+                
+                <div class="header-center">
+                    <h1 class="animate__animated animate__fadeIn">
+                        <i class="fas fa-robot"></i>
+                        <span id="currentModelName">DeepSeek AI</span>
+                    </h1>
+                    <div class="model-status">
+                        <span class="status-dot online"></span>
+                        <span id="modelStatus">Online • Fast Mode</span>
+                    </div>
+                </div>
+                
                 <div class="header-actions">
-                    <button class="voice-btn" onclick="toggleVoiceMode()">
+                    <button class="header-btn voice-toggle" id="voiceToggle" onclick="NovaVoice.toggleRecognition()">
                         <i class="fas fa-microphone"></i>
+                        <span class="btn-badge" id="voiceStatus"></span>
                     </button>
-                    <button class="tts-btn" onclick="toggleTTS()">
+                    <button class="header-btn tts-toggle" id="ttsToggle" onclick="NovaTTS.toggle()">
                         <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button class="header-btn settings-toggle" onclick="NovaUI.toggleSettings()">
+                        <i class="fas fa-sliders-h"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- Chat Messages -->
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages will be added here dynamically -->
-                <div class="message ai-message">
-                    <div class="message-avatar">
-                        <i class="fas fa-robot"></i>
+            <!-- Chat Container -->
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-content animate__animated animate__fadeIn">
+                        <div class="welcome-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h2>Welcome to Nova AI</h2>
+                        <p class="welcome-subtitle">Your intelligent assistant powered by multiple AI models</p>
+                        
+                        <div class="quick-prompts">
+                            <button class="prompt-btn" onclick="NovaChat.usePrompt('Write a creative story about AI')">
+                                <i class="fas fa-book"></i>
+                                Creative Writing
+                            </button>
+                            <button class="prompt-btn" onclick="NovaChat.usePrompt('Explain quantum computing simply')">
+                                <i class="fas fa-graduation-cap"></i>
+                                Learn Something
+                            </button>
+                            <button class="prompt-btn" onclick="NovaChat.usePrompt('Help me debug this code issue')">
+                                <i class="fas fa-code"></i>
+                                Code Help
+                            </button>
+                            <button class="prompt-btn" onclick="NovaChat.usePrompt('Generate business ideas for 2024')">
+                                <i class="fas fa-lightbulb"></i>
+                                Brainstorm
+                            </button>
+                        </div>
+                        
+                        <div class="features-showcase">
+                            <div class="feature">
+                                <i class="fas fa-brain"></i>
+                                <span>Multiple AI Models</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-microphone"></i>
+                                <span>Voice Input</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-volume-up"></i>
+                                <span>Text-to-Speech</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-history"></i>
+                                <span>Chat History</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="sender">Nova AI</span>
-                            <span class="time">Now</span>
-                        </div>
-                        <div class="message-text">
-                            Hello! I'm Nova AI, your intelligent assistant. I can connect to multiple AI models including DeepSeek, ChatGPT, and Grok. How can I help you today?
-                        </div>
-                        <div class="message-actions">
-                            <button onclick="speakText(this)"><i class="fas fa-volume-up"></i></button>
-                            <button onclick="copyText(this)"><i class="fas fa-copy"></i></button>
-                        </div>
+                </div>
+                
+                <!-- Messages will be inserted here -->
+                <div class="messages-container" id="messagesContainer"></div>
+                
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
+                    <div class="typing-text" id="typingText">DeepSeek is thinking...</div>
                 </div>
             </div>
 
             <!-- Input Area -->
-            <div class="input-area">
-                <div class="input-container">
-                    <button class="attach-btn">
+            <div class="input-container">
+                <!-- Voice Indicator -->
+                <div class="voice-indicator" id="voiceIndicator">
+                    <div class="voice-animation">
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring delay-1"></div>
+                        <div class="pulse-ring delay-2"></div>
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="voice-text" id="voiceText">Listening... Speak now</div>
+                    <div class="voice-actions">
+                        <button class="voice-action-btn cancel" onclick="NovaVoice.stopRecognition()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button class="voice-action-btn send" onclick="NovaVoice.sendVoiceMessage()">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Main Input -->
+                <div class="input-wrapper">
+                    <button class="input-action-btn attach-btn" onclick="NovaUI.showAttachMenu()">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <div class="input-wrapper">
+                    
+                    <div class="text-input-wrapper">
                         <textarea 
                             id="messageInput" 
-                            placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
+                            placeholder="Message Nova AI..."
                             rows="1"
-                            onkeydown="handleKeyDown(event)"
+                            oninput="NovaUI.resizeTextarea(this)"
+                            onkeydown="NovaChat.handleKeyDown(event)"
                         ></textarea>
+                        
                         <div class="input-actions">
-                            <button class="emoji-btn" onclick="toggleEmojiPicker()">
+                            <button class="input-action-btn emoji-btn" onclick="NovaUI.toggleEmojiPicker()">
                                 <i class="far fa-smile"></i>
+                            </button>
+                            <button class="input-action-btn mic-btn" onclick="NovaVoice.startRecognition()">
+                                <i class="fas fa-microphone"></i>
                             </button>
                         </div>
                     </div>
-                    <button class="send-btn" onclick="sendMessage()">
+                    
+                    <button class="input-action-btn send-btn" id="sendButton" onclick="NovaChat.sendMessage()">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
                 
-                <!-- Voice Input Indicator -->
-                <div class="voice-indicator" id="voiceIndicator" style="display: none;">
-                    <div class="voice-animation">
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
+                <!-- Quick Settings Bar -->
+                <div class="quick-settings">
+                    <div class="model-selector">
+                        <span class="setting-label">AI Model:</span>
+                        <div class="model-badges">
+                            <span class="model-badge active" data-model="deepseek" onclick="NovaAI.selectModel('deepseek')">DeepSeek</span>
+                            <span class="model-badge" data-model="chatgpt" onclick="NovaAI.selectModel('chatgpt')">ChatGPT</span>
+                            <span class="model-badge" data-model="grok" onclick="NovaAI.selectModel('grok')">Grok</span>
+                            <span class="model-badge" data-model="claude" onclick="NovaAI.selectModel('claude')">Claude</span>
+                        </div>
                     </div>
-                    <p>Listening... Speak now</p>
-                    <button class="stop-voice-btn" onclick="stopVoiceInput()">
-                        <i class="fas fa-stop"></i> Stop
-                    </button>
+                    
+                    <div class="response-settings">
+                        <span class="setting-label">Response:</span>
+                        <div class="response-options">
+                            <button class="response-option active" onclick="NovaAI.setResponseStyle('balanced')">
+                                <i class="fas fa-balance-scale"></i> Balanced
+                            </button>
+                            <button class="response-option" onclick="NovaAI.setResponseStyle('creative')">
+                                <i class="fas fa-palette"></i> Creative
+                            </button>
+                            <button class="response-option" onclick="NovaAI.setResponseStyle('precise')">
+                                <i class="fas fa-bullseye"></i> Precise
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <!-- AI Status -->
-                <div class="ai-status">
+                
+                <!-- Status Bar -->
+                <div class="status-bar">
                     <div class="status-item">
-                        <span class="status-label">Active AI:</span>
-                        <span class="status-value" id="activeAI">DeepSeek</span>
+                        <i class="fas fa-robot"></i>
+                        <span id="currentModel">DeepSeek</span>
                     </div>
                     <div class="status-item">
-                        <span class="status-label">Response Time:</span>
-                        <span class="status-value" id="responseTime">0.5s</span>
+                        <i class="fas fa-bolt"></i>
+                        <span id="responseSpeed">Fast Mode</span>
                     </div>
                     <div class="status-item">
-                        <span class="status-label">Mode:</span>
-                        <span class="status-value" id="activeMode">Text</span>
+                        <i class="fas fa-database"></i>
+                        <span id="tokenCount">0 tokens</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="responseTime">Ready</span>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
 
+        <!-- Modals & Overlays -->
+        
+        <!-- Emoji Picker -->
+        <div class="emoji-picker-modal" id="emojiPicker">
+            <div class="emoji-header">
+                <h3>Select Emoji</h3>
+                <button onclick="NovaUI.closeEmojiPicker()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="emoji-categories">
+                <button class="emoji-category active" data-category="smileys">😀 Smileys</button>
+                <button class="emoji-category" data-category="objects">🎒 Objects</button>
+                <button class="emoji-category" data-category="symbols">💝 Symbols</button>
+                <button class="emoji-category" data-category="flags">🏁 Flags</button>
+            </div>
+            <div class="emoji-grid" id="emojiGrid"></div>
+        </div>
+        
+        <!-- Attachment Menu -->
+        <div class="attach-menu-modal" id="attachMenu">
+            <div class="attach-option" onclick="NovaUI.attachImage()">
+                <i class="fas fa-image"></i>
+                <span>Image</span>
+            </div>
+            <div class="attach-option" onclick="NovaUI.attachFile()">
+                <i class="fas fa-file"></i>
+                <span>Document</span>
+            </div>
+            <div class="attach-option" onclick="NovaUI.attachCamera()">
+                <i class="fas fa-camera"></i>
+                <span>Camera</span>
+            </div>
+            <div class="attach-option" onclick="NovaUI.attachGallery()">
+                <i class="fas fa-photo-video"></i>
+                <span>Gallery</span>
+            </div>
+        </div>
+        
         <!-- Notification -->
-        <div class="notification" id="notification"></div>
-    </div>
-
-    <!-- Emoji Picker Modal -->
-    <div class="emoji-picker" id="emojiPicker">
-        <div class="emoji-header">
-            <h3>Select Emoji</h3>
-            <button onclick="closeEmojiPicker()"><i class="fas fa-times"></i></button>
+        <div class="notification-toast" id="notification">
+            <div class="notification-content">
+                <i class="fas fa-check-circle"></i>
+                <span id="notificationText">Notification</span>
+            </div>
         </div>
-        <div class="emoji-grid" id="emojiGrid"></div>
+        
+        <!-- Help Modal -->
+        <div class="help-modal" id="helpModal">
+            <div class="help-content">
+                <h2><i class="fas fa-question-circle"></i> Nova AI Help</h2>
+                <div class="help-sections">
+                    <div class="help-section">
+                        <h3><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h3>
+                        <ul>
+                            <li><kbd>Enter</kbd> - Send message</li>
+                            <li><kbd>Shift + Enter</kbd> - New line</li>
+                            <li><kbd>/</kbd> - Focus input</li>
+                            <li><kbd>Esc</kbd> - Close modals</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="fas fa-robot"></i> AI Models</h3>
+                        <ul>
+                            <li><strong>DeepSeek</strong> - Fast, technical responses</li>
+                            <li><strong>ChatGPT</strong> - Creative, detailed answers</li>
+                            <li><strong>Grok</strong> - Direct, witty responses</li>
+                            <li><strong>Claude</strong> - Thoughtful, safe analysis</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="fas fa-microphone"></i> Voice Features</h3>
+                        <p>Click microphone icon or say "Hey Nova" to start voice input</p>
+                    </div>
+                </div>
+                <button class="close-help" onclick="NovaUI.closeHelp()">Got it!</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="script.js"></script>
+    
+    <!-- Initialize App -->
+    <script>
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loader after 1.5 seconds
+            setTimeout(() => {
+                document.getElementById('novaLoader').classList.add('hidden');
+                document.getElementById('novaApp').style.display = 'flex';
+                
+                // Initialize all modules
+                NovaAI.init();
+                NovaUI.init();
+                NovaChat.init();
+                NovaVoice.init();
+                NovaTTS.init();
+                
+                // Load saved data
+                NovaStorage.load();
+                
+                // Show welcome message
+                setTimeout(() => {
+                    if (NovaChat.isEmpty()) {
+                        NovaChat.addMessage(
+                            "Hello! I'm Nova AI, your advanced assistant with multiple AI models, voice features, and smart capabilities. How can I help you today?",
+                            'ai',
+                            'Nova AI'
+                        );
+                    }
+                }, 500);
+            }, 1500);
+            
+            // Handle beforeinstall prompt for PWA
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Show install button after 10 seconds
+                setTimeout(() => {
+                    NovaUI.showNotification('📱 Install Nova AI as an app for better experience!');
+                }, 10000);
+            });
+        });
+        
+        // Handle service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(() => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker failed:', err));
+            });
+        }
+    </script>
 </body>
-                              </html>
+                                               </html>
