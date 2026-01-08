@@ -1,0 +1,51 @@
+{
+  "name": "Nova AI Assistant",
+  "short_name": "Nova AI",
+  "description": "Advanced AI assistant with multiple AI models and voice features",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10a37f",
+  "orientation": "portrait",
+  "categories": ["productivity", "utilities", "education"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%2310a37f%22>🤖</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://cdn.jsdelivr.net/npm/emoji-datasource-google/img/google/64/1f916.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/540x720/10a37f/ffffff?text=Nova+AI+Chat",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "https://via.placeholder.com/720x540/10a37f/ffffff?text=Nova+AI+Desktop",
+      "sizes": "720x540",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Chat",
+      "short_name": "Chat",
+      "description": "Start a new conversation",
+      "url": "./?new=true"
+    },
+    {
+      "name": "Voice Input",
+      "short_name": "Voice",
+      "description": "Start voice recording",
+      "url": "./?voice=true"
+    }
+  ]
+}
